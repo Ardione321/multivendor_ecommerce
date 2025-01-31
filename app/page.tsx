@@ -1,14 +1,15 @@
 import ThemeToogle from "@/components/shared/theme-toogle";
 import { Button } from "@/components/ui/button";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
     <div className="p-5">
-      <div className="w-100 flex justify-end">
-      <ThemeToogle />
+      <div className="w-100 flex gap-x-5 justify-end">
+        <UserButton />
+        <ThemeToogle />
       </div>
-      <h1 className="text-blue-500 font-barlow">Welcome to the ecommerce</h1>
-      <Button variant="destructive">Click here</Button>
+      <h1 className="text-blue-500 font-barlow">Home page</h1>
     </div>
   );
 }
