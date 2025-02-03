@@ -1,7 +1,12 @@
-import Header from "@/components/dashboard/header/header";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+
+// Header
+import Header from "@/components/dashboard/header/header";
+
+// Sidebar
+import Sidebar from "@/components/dashboard/sidebar/sidebar";
 
 const AdminDashboardLayout = async ({ children }: { children: ReactNode }) => {
   // Block non admins from accessing the admin dashboard
@@ -12,6 +17,7 @@ const AdminDashboardLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <div className="w-full h-full">
       {/* sidebar */}
+      <Sidebar />
       <div className="w-full ml-[300px]">
         {/* Header */}
         <Header />
