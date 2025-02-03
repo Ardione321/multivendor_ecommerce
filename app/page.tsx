@@ -1,5 +1,4 @@
-import ThemeToogle from "@/components/shared/theme-toogle";
-import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/shared/theme-toogle";
 import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
@@ -7,7 +6,7 @@ export default function Home() {
     <div className="p-5">
       <div className="w-100 flex gap-x-5 justify-end">
         <UserButton />
-        <ThemeToogle />
+        <ThemeToggle />
       </div>
       <h1 className="text-blue-500 font-barlow">Home page</h1>
     </div>

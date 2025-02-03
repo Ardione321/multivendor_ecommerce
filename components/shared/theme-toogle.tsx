@@ -12,7 +12,7 @@ import {
 import { Button } from "../ui/button";
 import { useTheme } from "next-themes";
 
-const ThemeToogle = () => {
+const ThemeToggle = () => {
   const { setTheme } = useTheme();
 
   return (
@@ -43,4 +43,4 @@ const ThemeToogle = () => {
   );
 };
 
-export default ThemeToogle;
+export default ThemeToggle;
