@@ -33,20 +33,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import ImageUpload from "../shared/image-upload";
 interface CategoryDetailsProps {
   data?: Category;
+  cloudinary_key: string;
 }
-const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
+const CategoryDetails: FC<CategoryDetailsProps> = ({
+  data,
+  cloudinary_key,
+}) => {
   // Form hook for managing form state and validation
   const form = useForm<z.infer<typeof CategoryFormSchema>>({
     mode: "onChange", // Form validation mode
     resolver: zodResolver(CategoryFormSchema), // Resolver for form validation
     defaultValues: {
-      // Setting default form values from data (if available)
-      name: data?.name,
+      name: data?.name || "", // Ensures it's always a string
       image: data?.image ? [{ url: data?.image }] : [],
-      url: data?.url,
-      featured: data?.featured,
+      url: data?.url || "", // Ensures it's always a string
+      featured: data?.featured ?? false, // Ensures it's always a boolean
     },
   });
   // Loading status based on form submission
@@ -54,6 +58,7 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
 
   // Reset form values when data changes
   useEffect(() => {
+    console.log("Data updated:", data);
     if (data) {
       form.reset({
         name: data.name || "",
@@ -62,8 +67,7 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
         featured: data.featured ?? false,
       });
     }
-    // Removed `form` from dependency array to prevent infinite re-renders
-  }, [data]);
+  }, [data]); // Remove form from dependencies to prevent unnecessary re-renders
 
   // Submit handler for form submission
   const handleSubmit = async (values: z.infer<typeof CategoryFormSchema>) => {
@@ -86,6 +90,31 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <ImageUpload
+                        type="profile"
+                        cloudinary_key={cloudinary_key}
+                        value={field.value.map((image) => image.url)}
+                        disabled={isLoading}
+                        onChange={(url) => field.onChange([{ url }])}
+                        onRemove={(url) =>
+                          field.onChange([
+                            ...field.value.filter(
+                              (current) => current.url !== url
+                            ),
+                          ])
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 disabled={isLoading}
                 control={form.control}
@@ -139,8 +168,8 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
                 {isLoading
                   ? "Loading..."
                   : data?.id
-                  ? "Save category information"
-                  : "Create category"}
+                    ? "Save category information"
+                    : "Create category"}
               </Button>
             </form>
           </Form>
