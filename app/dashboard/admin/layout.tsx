@@ -17,7 +17,7 @@ const AdminDashboardLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <div className="w-full h-full">
       {/* sidebar */}
-      <Sidebar />
+      <Sidebar isAdmin/>
       <div className="w-full ml-[300px]">
         {/* Header */}
         <Header />
