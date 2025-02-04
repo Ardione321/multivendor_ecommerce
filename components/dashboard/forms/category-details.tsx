@@ -34,14 +34,29 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import ImageUpload from "../shared/image-upload";
+
+// Queries
+import { upsertCategory } from "@/queries/category";
+
+// Utils
+import { v4 } from "uuid";
+
+// hooks and navigation
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+
 interface CategoryDetailsProps {
   data?: Category;
   cloudinary_key: string;
 }
+
 const CategoryDetails: FC<CategoryDetailsProps> = ({
   data,
   cloudinary_key,
 }) => {
+  const { toast } = useToast();
+  const router = useRouter();
+
   // Form hook for managing form state and validation
   const form = useForm<z.infer<typeof CategoryFormSchema>>({
     mode: "onChange", // Form validation mode
@@ -53,6 +68,7 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({
       featured: data?.featured ?? false, // Ensures it's always a boolean
     },
   });
+
   // Loading status based on form submission
   const isLoading = form.formState.isSubmitting;
 
@@ -67,11 +83,44 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({
         featured: data.featured ?? false,
       });
     }
-  }, [data]); // Remove form from dependencies to prevent unnecessary re-renders
+  }, [data, form]);
 
   // Submit handler for form submission
   const handleSubmit = async (values: z.infer<typeof CategoryFormSchema>) => {
-    console.log(values);
+    try {
+      // Upsert the category data
+      const response = await upsertCategory({
+        id: data?.id ? data.id : v4(),
+        name: values.name,
+        image: values.image[0].url,
+        url: values.url,
+        featured: values.featured,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      //displaying success message
+      toast({
+        title: data?.id
+          ? "Category has been updated"
+          : `Congratulations ${response.name} is now created`,
+      });
+
+      // Redirect or Refresh data
+      if (data?.id) {
+        router.refresh();
+      } else {
+        router.push("/dashboard/admin/categories");
+      }
+    } catch (error: any) {
+      // Handling form submission errors
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "!Oops",
+        description: error.toString(),
+      });
+    }
   };
   return (
     <AlertDialog>

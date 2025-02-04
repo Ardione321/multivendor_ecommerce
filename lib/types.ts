@@ -1,5 +1,5 @@
 export interface DashboardSidebarMenuInterface {
-    label: string;
-    icon: string;
-    link: string;
+  label: string;
+  icon: string;
+  link: string;
 }
