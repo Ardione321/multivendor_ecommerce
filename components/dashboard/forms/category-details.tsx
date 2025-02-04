@@ -47,13 +47,9 @@ import { useRouter } from "next/navigation";
 
 interface CategoryDetailsProps {
   data?: Category;
-  cloudinary_key: string;
 }
 
-const CategoryDetails: FC<CategoryDetailsProps> = ({
-  data,
-  cloudinary_key,
-}) => {
+const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
   const { toast } = useToast();
   const router = useRouter();
 
@@ -147,7 +143,6 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({
                     <FormControl>
                       <ImageUpload
                         type="profile"
-                        cloudinary_key={cloudinary_key}
                         value={field.value.map((image) => image.url)}
                         disabled={isLoading}
                         onChange={(url) => field.onChange([{ url }])}

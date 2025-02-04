@@ -18,6 +18,8 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
@@ -95,7 +97,7 @@ export const columns: ColumnDef<Category>[] = [
     header: "Featured",
     cell: ({ row }) => {
       return (
-        <span className="text-muted-foreground flex justify-center">
+        <span className="text-muted-foreground flex">
           {row.original.featured ? (
             <BadgeCheck className="stroke-green-300" />
           ) : (
@@ -149,7 +151,7 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 // Custom modal component
                 <CustomModal>
                   {/* Store details component */}
-                  <CategoryDetails cloudinary_key="" data={{ ...rowData }} />
+                  <CategoryDetails data={{ ...rowData }} />
                 </CustomModal>,
                 async () => {
                   return {
@@ -164,43 +166,48 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem className="flex gap-2" onClick={() => {}}>
+            <DropdownMenuItem className="flex gap-2">
               <Trash size={15} /> Delete category
             </DropdownMenuItem>
           </AlertDialogTrigger>
         </DropdownMenuContent>
       </DropdownMenu>
-      <AlertDialogContent className="max-w-lg">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-left">
-            Are you absolutely sure?
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
-            This action cannot be undone. This will permanently delete the
-            category and related data.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex items-center">
-          <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            disabled={loading}
-            className="bg-destructive hover:bg-destructive mb-2 text-white"
-            onClick={async () => {
-              setLoading(true);
-              await deleteCategory(rowData.id);
-              toast({
-                title: "Deleted category",
-                description: "The category has been deleted.",
-              });
-              setLoading(false);
-              router.refresh();
-              setClose();
-            }}
-          >
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+
+      {/* Move AlertDialogContent inside AlertDialog */}
+      <AlertDialogPortal>
+        <AlertDialogOverlay />
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle id="dialog-title" className="text-left">
+              Are you absolutely sure?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left">
+              This action cannot be undone. This will permanently delete the
+              category and related data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex items-center">
+            <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={loading}
+              className="bg-destructive hover:bg-destructive mb-2 text-white"
+              onClick={async () => {
+                setLoading(true);
+                await deleteCategory(rowData.id);
+                toast({
+                  title: "Deleted category",
+                  description: "The category has been deleted.",
+                });
+                setLoading(false);
+                router.refresh();
+                setClose();
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogPortal>
     </AlertDialog>
   );
 };
