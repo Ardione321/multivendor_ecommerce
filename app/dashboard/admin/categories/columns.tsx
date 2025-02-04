@@ -67,7 +67,7 @@ export const columns: ColumnDef<Category>[] = [
             alt=""
             width={1000}
             height={1000}
-            className="w-40 h-40 rounded-full object-cover shadow-2xl"
+            className="w-40 h-40 rounded-full object-cover shadow-lg"
           />
         </div>
       );

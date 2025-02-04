@@ -90,7 +90,6 @@ export default function DataTable<TData, TValue>({
             <Button
               className="flex- gap-2"
               onClick={(event) => {
-                event.stopPropagation(); // This prevents parent events from blocking the click
                 if (modalChildren)
                   setOpen(
                     <CustomModal
