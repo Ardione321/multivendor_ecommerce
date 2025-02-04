@@ -89,7 +89,7 @@ export default function DataTable<TData, TValue>({
           {modalChildren && (
             <Button
               className="flex- gap-2"
-              onClick={(event) => {
+              onClick={() => {
                 if (modalChildren)
                   setOpen(
                     <CustomModal
