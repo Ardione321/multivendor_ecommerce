@@ -72,55 +72,58 @@ export const upsertSubCategory = async (subCategory: SubCategory) => {
   }
 };
 
-// Function: getAllCategories
-// Description: Retrieves all categories from the database.
+// Function: getAllSubCategories
+// Description: Retrieves all subCategories from the database.
 // Permission Level: Public
-// Returns: Array of categories sorted by updatedAt date in descending order.
+// Returns: Array of subCategories sorted by updatedAt date in descending order.
 
-export const getAllCategories = async () => {
-  // Retrieve all categories from the database
-  const categories = await db.category.findMany({
+export const getAllSubCategories = async () => {
+  // Retrieve all subCategories from the database
+  const subCategories = await db.subCategory.findMany({
+    include: {
+      category: true,
+    },
     orderBy: {
       updatedAt: "desc",
     },
   });
-  return categories;
+  return subCategories;
 };
 
-// Function: getCategory
-// Description: Retrieves a specific category from the database.
+// Function: getSubCategory
+// Description: Retrieves a specific SubCategory from the database.
 // Access Level: Public
 // Parameters:
-//   - categoryId: The ID of the category to be retrieved.
-// Returns: Details of the requested category.
+//   - SubCategoryId: The ID of the SubCategory to be retrieved.
+// Returns: Details of the requested SubCategory.
 
-export const getCategory = async (categoryId: string) => {
-  if (!categoryId) throw new Error("Please provide category ID.");
-  const category = await db.category.findUnique({
+export const getSubCategory = async (subCategoryId: string) => {
+  if (!subCategoryId) throw new Error("Please provide subCategoryId ID.");
+  const subCategory = await db.subCategory.findUnique({
     where: {
-      id: categoryId,
+      id: subCategoryId,
     },
   });
-  return category;
+  return subCategory;
 };
 
-// Function: deleteCategory
-// Description: Deletes a category from the database.
+// Function: deleteSubCategory
+// Description: Deletes a subCategory from the database.
 // Permission Level: Admin only
 // Parameters:
-//   - categoryId: The ID of the category to be deleted.
+//   - categoryId: The ID of the subCategory to be deleted.
 // Returns: Response indicating success or failure of the deletion operation.
 
-export const deleteCategory = async (categoryId: string) => {
+export const deleteSubCategory = async (subCategoryId: string) => {
   const user = await currentUser();
   if (!user) throw new Error("User is not authenticated");
   if (user.privateMetadata.role !== "ADMIN")
     throw new Error("Unauthorized Access: Admin Privileges Required for Entry");
-  if (!categoryId) throw new Error("Please provide category ID.");
+  if (!subCategoryId) throw new Error("Please provide subCategory ID.");
 
-  const response = await db.category.delete({
+  const response = await db.subCategory.delete({
     where: {
-      id: categoryId,
+      id: subCategoryId,
     },
   });
 

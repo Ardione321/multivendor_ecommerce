@@ -7,12 +7,14 @@ import { FC, useEffect } from "react";
 import { Category } from "@prisma/client";
 
 // Form handling utilities
-import { z } from "zod";
+import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 // Schema
 import { CategoryFormSchema } from "@/lib/schemas";
+
+// UI Components
 import { AlertDialog } from "@/components/ui/alert-dialog";
 import {
   Card,
@@ -24,15 +26,15 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import ImageUpload from "../shared/image-upload";
 
 // Queries
@@ -40,8 +42,6 @@ import { upsertCategory } from "@/queries/category";
 
 // Utils
 import { v4 } from "uuid";
-
-// hooks and navigation
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
@@ -50,18 +50,20 @@ interface CategoryDetailsProps {
 }
 
 const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
-  const { toast } = useToast();
-  const router = useRouter();
+  // Initializing necessary hooks
+  const { toast } = useToast(); // Hook for displaying toast messages
+  const router = useRouter(); // Hook for routing
 
   // Form hook for managing form state and validation
   const form = useForm<z.infer<typeof CategoryFormSchema>>({
     mode: "onChange", // Form validation mode
     resolver: zodResolver(CategoryFormSchema), // Resolver for form validation
     defaultValues: {
-      name: data?.name || "", // Ensures it's always a string
+      // Setting default form values from data (if available)
+      name: data?.name,
       image: data?.image ? [{ url: data?.image }] : [],
-      url: data?.url || "", // Ensures it's always a string
-      featured: data?.featured ?? false, // Ensures it's always a boolean
+      url: data?.url,
+      featured: data?.featured,
     },
   });
 
@@ -70,13 +72,12 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
 
   // Reset form values when data changes
   useEffect(() => {
-    console.log("Data updated:", data);
     if (data) {
       form.reset({
-        name: data.name || "",
-        image: data.image ? [{ url: data.image }] : [],
-        url: data.url || "",
-        featured: data.featured ?? false,
+        name: data?.name,
+        image: [{ url: data?.image }],
+        url: data?.url,
+        featured: data?.featured,
       });
     }
   }, [data, form]);
@@ -84,7 +85,7 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
   // Submit handler for form submission
   const handleSubmit = async (values: z.infer<typeof CategoryFormSchema>) => {
     try {
-      // Upsert the category data
+      // Upserting category data
       const response = await upsertCategory({
         id: data?.id ? data.id : v4(),
         name: values.name,
@@ -95,11 +96,11 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
         updatedAt: new Date(),
       });
 
-      //displaying success message
+      // Displaying success message
       toast({
         title: data?.id
-          ? "Category has been updated"
-          : `Congratulations ${response.name} is now created`,
+          ? "Category has been updated."
+          : `Congratulations! '${response?.name}' is now created.`,
       });
 
       // Redirect or Refresh data
@@ -113,11 +114,12 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
       console.log(error);
       toast({
         variant: "destructive",
-        title: "!Oops",
+        title: "Oops!",
         description: error.toString(),
       });
     }
   };
+
   return (
     <AlertDialog>
       <Card className="w-full">
@@ -125,8 +127,8 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
           <CardTitle>Category Information</CardTitle>
           <CardDescription>
             {data?.id
-              ? `Update ${data?.name} category information`
-              : "Lets create a category. You can edit category settings later from the categories table or category page."}
+              ? `Update ${data?.name} category information.`
+              : " Lets create a category. You can edit category later from the categories table or the category page."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -210,7 +212,7 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ data }) => {
               />
               <Button type="submit" disabled={isLoading}>
                 {isLoading
-                  ? "Loading..."
+                  ? "loading..."
                   : data?.id
                     ? "Save category information"
                     : "Create category"}
