@@ -44,6 +44,7 @@ import {upsertCategory} from "@/queries/category";
 import {v4} from "uuid";
 import {useToast} from "@/hooks/use-toast";
 import {useRouter} from "next/navigation";
+import {handleError} from "@/lib/utils";
 
 interface CategoryDetailsProps {
     data?: Category;
@@ -85,7 +86,7 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({data}) => {
     // Submit handler for form submission
     const handleSubmit = async (values: z.infer<typeof CategoryFormSchema>) => {
         try {
-            // Upserting category data
+            // Upsert category data
             const response = await upsertCategory({
                 id: data?.id ? data.id : v4(),
                 name: values.name,
@@ -109,13 +110,12 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({data}) => {
             } else {
                 router.push("/dashboard/admin/categories");
             }
-        } catch (error: any) {
-            // Handling form submission errors
-            console.log(error);
+        } catch (error) {
+            const errorMessage = handleError(error);
             toast({
                 variant: "destructive",
                 title: "Oops!",
-                description: error.toString(),
+                description: errorMessage,
             });
         }
     };
