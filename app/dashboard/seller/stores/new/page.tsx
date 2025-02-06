@@ -1,6 +1,10 @@
+import StoreDetails from "@/components/dashboard/forms/store-details";
+
 const SellerNewStorePage = () => {
-  return <div>Create new store here</div>;
+  return <div className="">
+    <StoreDetails />
+  </div>;
 };
 
 export default SellerNewStorePage;
-``
+
