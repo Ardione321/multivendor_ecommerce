@@ -45,6 +45,7 @@ import {v4} from "uuid";
 import {useToast} from "@/hooks/use-toast";
 import {useRouter} from "next/navigation";
 import {handleError} from "@/lib/utils";
+import {Textarea} from "@/components/ui/textarea";
 
 interface CategoryDetailsProps {
     data?: Store;
@@ -142,6 +143,7 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
                             onSubmit={form.handleSubmit(handleSubmit)}
                             className="space-y-4"
                         >
+                            {/* Logo - Cover */}
                             <div className="relative py-2 mb-24 ">
                                 <FormField
                                     control={form.control}
@@ -192,7 +194,7 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
                                     )}
                                 />
                             </div>
-
+                            {/* Name  */}
                             <FormField
                                 disabled={isLoading}
                                 control={form.control}
@@ -201,12 +203,58 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
                                     <FormItem className="flex-1">
                                         <FormLabel>Store name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Store Name" {...field} />
+                                            <Input placeholder="Name" {...field} />
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
                             />
+                            {/* Description */}
+                            <FormField
+                                disabled={isLoading}
+                                control={form.control}
+                                name="description"
+                                render={({field}) => (
+                                    <FormItem className="flex-1">
+                                        <FormLabel>Store description</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="Description" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                            {/* Email - Phone */}
+                            <div className="flex flex-col gap-6 md:flex-row">
+                                <FormField
+                                    disabled={isLoading}
+                                    control={form.control}
+                                    name="email"
+                                    render={({field}) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Store email</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Email" {...field} type="email"/>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    disabled={isLoading}
+                                    control={form.control}
+                                    name="phone"
+                                    render={({field}) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Store phone</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Phone" {...field} />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                             <FormField
                                 disabled={isLoading}
                                 control={form.control}
@@ -237,7 +285,7 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
                                         <div className="space-y-1 leading-none">
                                             <FormLabel>Featured</FormLabel>
                                             <FormDescription>
-                                                This Category will appear on the home page
+                                                This Store will appear on the home page
                                             </FormDescription>
                                         </div>
                                     </FormItem>
