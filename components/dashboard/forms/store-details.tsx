@@ -1,7 +1,9 @@
 "use client";
 
-// React
+// React, Next.js
 import {FC, useEffect} from "react";
+import {useToast} from "@/hooks/use-toast";
+import {useRouter} from "next/navigation";
 
 // Prisma model
 import {Store} from "@prisma/client";
@@ -36,42 +38,39 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import ImageUpload from "../shared/image-upload";
+import {Textarea} from "@/components/ui/textarea";
 
 // Queries
-import {upsertCategory} from "@/queries/category";
+import {upsertStore} from "@/queries/store";
 
 // Utils
 import {v4} from "uuid";
-import {useToast} from "@/hooks/use-toast";
-import {useRouter} from "next/navigation";
 import {handleError} from "@/lib/utils";
-import {Textarea} from "@/components/ui/textarea";
 
-interface CategoryDetailsProps {
+
+interface StoreDetailsProps {
     data?: Store;
 }
 
-const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
+const StoreDetails: FC<StoreDetailsProps> = ({data}) => {
     // Initializing necessary hooks
     const {toast} = useToast(); // Hook for displaying toast messages
     const router = useRouter(); // Hook for routing
 
     // Form hook for managing form state and validation
     const form = useForm<z.infer<typeof StoreFormSchema>>({
-        mode: "onChange", // Form validation mode
-        resolver: zodResolver(StoreFormSchema), // Resolver for form validation
+        mode: "onChange",
+        resolver: zodResolver(StoreFormSchema),
         defaultValues: {
-            // Setting default form values from data (if available)
-            name: data?.name,
-            description: data?.description,
-            email: data?.email,
-            phone: data?.phone,
-            url: data?.url,
-            logo: data?.logo ? [{url: data?.logo}] : [],
-            cover: data?.cover ? [{url: data?.cover}] : [],
-            status: data?.status.toString(),
-            featured: data?.featured,
-            // image: data?.image ? [{ url: data?.image }] : [],
+            name: data?.name ?? "", // Ensure this has a default value
+            description: data?.description ?? "",
+            email: data?.email ?? "",
+            phone: data?.phone ?? "",
+            url: data?.url ?? "",
+            logo: data?.logo ? [{url: data.logo}] : [], // Ensure logo is always an array, even if empty
+            cover: data?.cover ? [{url: data.cover}] : [], // Ensure cover is always an array, even if empty
+            featured: data?.featured ?? false, // Default to false if not provided
+            status: data?.status?.toString() ?? "PENDING", // Default status if not available
         },
     });
 
@@ -82,9 +81,15 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
     useEffect(() => {
         if (data) {
             form.reset({
-                ...data,
+                name: data?.name,
+                description: data?.description,
+                email: data?.email,
+                phone: data?.phone,
                 logo: [{url: data?.logo}],
                 cover: [{url: data?.cover}],
+                url: data?.url,
+                featured: data?.featured,
+                status: data?.status,
             });
         }
     }, [data, form]);
@@ -92,29 +97,29 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
     // Submit handler for form submission
     const handleSubmit = async (values: z.infer<typeof StoreFormSchema>) => {
         try {
-            // Upsert category data
-            const response = await upsertCategory({
+            const response = await upsertStore({
                 id: data?.id ? data.id : v4(),
                 name: values.name,
-                image: values.image[0].url,
+                description: values.description,
+                email: values.email,
+                phone: values.phone,
+                logo: values.logo[0].url,
+                cover: values.cover[0].url,
                 url: values.url,
                 featured: values.featured,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
-
-            // Displaying success message
             toast({
                 title: data?.id
-                    ? "Category has been updated."
+                    ? "Store has been updated."
                     : `Congratulations! '${response?.name}' is now created.`,
             });
 
-            // Redirect or Refresh data
             if (data?.id) {
                 router.refresh();
             } else {
-                router.push("/dashboard/admin/categories");
+                router.push(`/dashboard/seller/stores/${response.url}`);
             }
         } catch (error) {
             const errorMessage = handleError(error);
@@ -125,6 +130,7 @@ const StoreDetails: FC<CategoryDetailsProps> = ({data}) => {
             });
         }
     };
+
 
     return (
         <AlertDialog>
