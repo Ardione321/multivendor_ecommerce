@@ -2,18 +2,12 @@
 
 // DB
 import { db } from "@/lib/db";
-import {
-    CountryWithShippingRatesType,
-    StoreDefaultShippingType,
-    StoreStatus,
-    StoreType,
-} from "@/lib/types";
 
 // Clerk
 import { currentUser } from "@clerk/nextjs/server";
 
 // Prisma models
-import { ShippingRate, Store } from "@prisma/client";
+import { Store } from "@prisma/client";
 
 // Function: upsertStore
 // Description: Upserts store details into the database, ensuring uniqueness of name,url, email, and phone number.
@@ -87,7 +81,6 @@ export const upsertStore = async (store: Store) => {
                 },
             },
         });
-
         return storeDetails;
     } catch (error) {
         console.log(error);
