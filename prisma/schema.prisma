@@ -100,7 +100,7 @@ model Product {
   id          String @id @default(uuid())
   name        String
   description String
-  slug        String
+  slug        String @unique
   brand       String
   rating      Float  @default(0)
 
@@ -109,6 +109,8 @@ model Product {
 
   storeId String
   store   Store  @relation("StoreToProduct", fields: [storeId], references: [id])
+
+  variants ProductVariant[] @relation("ProductToProductVariant")
 
   categoryId String
   category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
@@ -119,4 +121,69 @@ model Product {
   @@index([storeId])
   @@index([categoryId])
   @@index([subCategoryId])
+}
+
+model ProductVariant {
+  id                 String  @id @default(uuid())
+  variantName        String
+  variantDescription String
+  slug               String  @unique
+  isSale             Boolean @default(false)
+  keywords           String
+  sku                String
+
+  productId String
+  product   Product @relation("ProductToProductVariant", fields: [productId], references: [id])
+
+  sizes  Size[]                @relation("ProductVariantSizes")
+  images ProductVariantImage[] @relation("ProductVariantImage")
+  colors Color[]               @relation("ProductVariantColors")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([productId])
+}
+
+model Size {
+  id       String @id @default(uuid())
+  size     String
+  quantity Int
+  price    Float
+  discount Float  @default(0)
+
+  productVariantId String
+  productVariant   ProductVariant @relation("ProductVariantSizes", fields: [productVariantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([productVariantId])
+}
+
+model ProductVariantImage {
+  id  String @id @default(uuid())
+  url String
+  alt String @default("")
+
+  productVariantId String
+  productVariant   ProductVariant @relation("ProductVariantImage", fields: [productVariantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([productVariantId])
+}
+
+model Color {
+  id   String @id @default(uuid())
+  name String
+
+  productVariantId String
+  productVariant   ProductVariant @relation("ProductVariantColors", fields: [productVariantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([productVariantId])
 }
