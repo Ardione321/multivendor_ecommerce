@@ -36,6 +36,8 @@ model Category {
 
   subCategories SubCategory[] @relation("CategoryToSubcategory")
 
+  product Product[] @relation("CategoryToProduct")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -49,6 +51,8 @@ model SubCategory {
 
   categoryId String
   category   Category @relation("CategoryToSubcategory", fields: [categoryId], references: [id])
+
+  product Product[] @relation("SubCategoryToProduct")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,5 +91,32 @@ model Store {
   userId String
   user   User   @relation("UserStores", fields: [userId], references: [id])
 
+  products Product[] @relation("StoreToProduct")
+
   @@index([userId])
+}
+
+model Product {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  slug        String
+  brand       String
+  rating      Float  @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  storeId String
+  store   Store  @relation("StoreToProduct", fields: [storeId], references: [id])
+
+  categoryId String
+  category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+
+  subCategoryId String
+  subCategory   SubCategory @relation("SubCategoryToProduct", fields: [subCategoryId], references: [id])
+
+  @@index([storeId])
+  @@index([categoryId])
+  @@index([subCategoryId])
 }
