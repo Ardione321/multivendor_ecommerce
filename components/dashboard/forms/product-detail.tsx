@@ -1,7 +1,7 @@
 "use client";
 
 // React, Next.js
-import {FC, useEffect} from "react";
+import {FC, useEffect, useState} from "react";
 import {useToast} from "@/hooks/use-toast";
 import {useRouter} from "next/navigation";
 
@@ -48,6 +48,7 @@ import {v4} from "uuid";
 import {handleError} from "@/lib/utils";
 import {ProductWithVariantType} from "@/lib/types";
 import {Category} from "@prisma/client";
+import ImagesPreviewGrid from "@/components/dashboard/shared/images-preview-grid";
 
 
 interface StoreDetailsProps {
@@ -60,6 +61,9 @@ const ProductDetails: FC<StoreDetailsProps> = ({data, categories, storeUrl}) => 
     // Initializing necessary hooks
     const {toast} = useToast(); // Hook for displaying toast messages
     const router = useRouter(); // Hook for routing
+
+    // Temporary state for images
+    const [images, setImages] = useState<{url: string}[]>([]);
 
     // Form hook for managing form state and validation
     const form = useForm<z.infer<typeof ProductFormSchema>>({
@@ -155,50 +159,69 @@ const ProductDetails: FC<StoreDetailsProps> = ({data, categories, storeUrl}) => 
                                     render={({field}) => (
                                         <FormItem>
                                             <FormControl>
-                                                <ImageUpload
-                                                    dontShowPreview
-                                                    type="standard"
-                                                    value={field.value.map((image) => image.url)}
-                                                    disabled={isLoading}
-                                                    onChange={(url) => field.onChange([{url}])}
-                                                    onRemove={(url) =>
-                                                        field.onChange([
-                                                            ...field.value.filter(
-                                                                (current) => current.url !== url
-                                                            ),
-                                                        ])
-                                                    }
-                                                />
+                                               <div>
+                                                   <ImagesPreviewGrid
+                                                       images={form.getValues().images}
+                                                       onRemove={(url) =>
+                                                           field.onChange([
+                                                               ...field.value.filter(
+                                                                   (current) => current.url !== url
+                                                               ),
+                                                           ])
+                                                       }
+                                                   />
+                                                   <FormMessage className="!mt-4"/>
+                                                   <ImageUpload
+                                                       dontShowPreview
+                                                       type="standard"
+                                                       value={field.value.map((image) => image.url)}
+                                                       disabled={isLoading}
+                                                       onChange={(url) => {
+                                                           setImages((prevImages) => {
+                                                               const updatedImages = [...prevImages, {url}];
+                                                               field.onChange(updatedImages);
+                                                               return updatedImages;
+                                                           })
+                                                       }}
+                                                       onRemove={(url) =>
+                                                           field.onChange([
+                                                               ...field.value.filter(
+                                                                   (current) => current.url !== url
+                                                               ),
+                                                           ])
+                                                       }
+                                                   />
+                                               </div>
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                                <FormField
+                                    disabled={isLoading}
+                                    control={form.control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem className="flex-1">
+                                            <FormControl>
+                                                <Input placeholder="Product name" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
-                            </div>
-                            <div className="flex flex-col lg:flex-row gap-4">
-                                    <FormField
-                                        disabled={isLoading}
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem className="flex-1">
-                                                <FormControl>
-                                                    <Input placeholder="Product name" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+
+                            <div>
                                 <FormField
                                     disabled={isLoading}
                                     control={form.control}
                                     name="variantName"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem className="flex-1">
                                             <FormControl>
                                                 <Input placeholder="Variant name" {...field} />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
