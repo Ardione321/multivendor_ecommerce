@@ -24,11 +24,11 @@ const SellerStoreDashboardLayout = async ({
   });
 
   return (
-    <div className="h-full w-full flex ">
+    <div className="h-full w-full flex">
       <Sidebar stores={stores} />
       <div className="w-full ml-[300px]">
         <Header />
-        <div className="w-full mt-[75px]">{children}</div>
+        <div className="w-full mt-[75px] p-4">{children}</div>
       </div>
     </div>
   );
